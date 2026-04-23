@@ -1,36 +1,48 @@
-/* إعدادات المتغيرات والألوان */
+/* إعدادات المتغيرات والألوان (ثيم وتين - Wateen) */
 :root {
-    --bg-color: #f8fafc;
-    --text-color: #0f172a;
-    --card-bg: #ffffff;
-    --border-color: #e2e8f0;
-    --primary-color: #3b82f6;
-    --primary-hover: #2563eb;
+    /* الوضع النهاري (Blush & Cream) */
+    --bg-color: #fdf8f5;
+    --text-color: #2d1b2e;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --border-color: rgba(226, 192, 198, 0.5);
+    --primary-color: #c94a5c;
+    --primary-hover: #a83545;
     --danger-color: #ef4444;
     --danger-hover: #dc2626;
-    --good-bg: #dcfce7;
+    
+    --good-bg: rgba(220, 252, 231, 0.7);
     --good-border: #86efac;
-    --bad-bg: #fee2e2;
+    --bad-bg: rgba(254, 226, 226, 0.7);
     --bad-border: #fca5a5;
-    --chat-me: #3b82f6;
-    --chat-other: #f1f5f9;
+    
+    --chat-me: #c94a5c;
+    --chat-me-text: #ffffff;
+    --chat-other: #ffffff;
+    --chat-other-text: #2d1b2e;
+    --shadow-subtle: 0 8px 30px rgba(201, 74, 92, 0.08);
 }
 
 [data-theme="dark"] {
-    --bg-color: #0f172a;
-    --text-color: #f8fafc;
-    --card-bg: #1e293b;
-    --border-color: #334155;
-    --primary-color: #3b82f6;
-    --primary-hover: #60a5fa;
+    /* الوضع الليلي (Deep Crimson & Charcoal) */
+    --bg-color: #120e10;
+    --text-color: #fcebeb;
+    --card-bg: rgba(30, 22, 25, 0.7);
+    --border-color: rgba(201, 74, 92, 0.2);
+    --primary-color: #e55c70;
+    --primary-hover: #ff7489;
     --danger-color: #ef4444;
     --danger-hover: #f87171;
+    
     --good-bg: rgba(22, 101, 52, 0.3);
-    --good-border: #166534;
+    --good-border: rgba(34, 197, 94, 0.4);
     --bad-bg: rgba(153, 27, 27, 0.3);
-    --bad-border: #991b1b;
-    --chat-me: #2563eb;
-    --chat-other: #334155;
+    --bad-border: rgba(239, 68, 68, 0.4);
+    
+    --chat-me: #e55c70;
+    --chat-me-text: #ffffff;
+    --chat-other: rgba(45, 33, 38, 0.9);
+    --chat-other-text: #fcebeb;
+    --shadow-subtle: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* أساسيات */
@@ -38,194 +50,314 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    transition: background-color 0.3s, color 0.3s;
+    font-family: 'Tajawal', sans-serif;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.4s;
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
     min-height: 100vh;
+    background-image: radial-gradient(circle at 10% 20%, rgba(201, 74, 92, 0.05) 0%, transparent 40%),
+                      radial-gradient(circle at 90% 80%, rgba(201, 74, 92, 0.05) 0%, transparent 40%);
+    background-attachment: fixed;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px 20px;
 }
 
 .hidden {
     display: none !important;
+    opacity: 0;
 }
 
-/* أزرار */
+/* أزرار ومقابس */
 button {
     cursor: pointer;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+button:active {
+    transform: scale(0.97);
 }
 
 .primary-btn {
     background-color: var(--primary-color);
     color: #ffffff;
+    box-shadow: 0 4px 15px rgba(201, 74, 92, 0.3);
 }
 
 .primary-btn:hover {
     background-color: var(--primary-hover);
+    box-shadow: 0 6px 20px rgba(201, 74, 92, 0.4);
+    transform: translateY(-2px);
 }
 
 .danger-btn {
     background-color: transparent;
     color: var(--danger-color);
-    border: 1px solid var(--danger-color);
+    border: 1.5px solid var(--danger-color);
+    padding: 10px 20px;
 }
 
 .danger-btn:hover {
     background-color: var(--danger-color);
     color: #ffffff;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
 }
 
 .theme-btn {
     position: fixed;
-    top: 20px;
-    left: 20px;
+    top: 25px;
+    left: 25px;
     background-color: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-subtle);
     z-index: 1000;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: 500;
 }
 
-/* شاشة الدخول */
+.theme-btn:hover {
+    background-color: var(--border-color);
+}
+
+/* شاشة الدخول (Wateen Glassmorphism) */
 .login-box {
     background-color: var(--card-bg);
-    max-width: 400px;
-    margin: 100px auto;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    max-width: 420px;
+    margin: 12vh auto;
+    padding: 50px 40px;
+    border-radius: 24px;
+    box-shadow: var(--shadow-subtle);
     border: 1px solid var(--border-color);
     text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.logo-area {
+    margin-bottom: 25px;
+}
+
+.heart-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    animation: heartbeat 2s infinite;
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+    60% { transform: scale(1); }
 }
 
 .login-box h2 {
-    margin-bottom: 10px;
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--primary-color), #ff8a9c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
 }
 
 .login-box p {
-    color: #64748b;
-    margin-bottom: 20px;
-    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 30px;
+    font-size: 15px;
 }
 
 .login-box input {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--bg-color);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.05);
     color: var(--text-color);
     outline: none;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .login-box input:focus {
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(201, 74, 92, 0.1);
 }
 
 .login-box button {
     width: 100%;
+    font-size: 16px;
+    padding: 15px;
 }
 
 .error-msg {
     color: var(--danger-color);
-    font-size: 13px;
-    margin-top: 10px;
+    font-size: 14px;
+    margin-top: 15px;
+    font-weight: 500;
+    min-height: 20px;
 }
 
 /* التطبيق الرئيسي */
+#mainApp {
+    animation: fadeIn 0.6s ease-out;
+}
+
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    border-radius: 20px;
     border: 1px solid var(--border-color);
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-subtle);
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-title h2 {
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.heart-icon-small {
+    font-size: 24px;
+    animation: heartbeat 2s infinite;
+}
+
+.user-info {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+#displayUsername {
+    font-weight: 800;
+    color: var(--primary-color);
 }
 
 .app-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 30px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 950px) {
     .app-grid {
         grid-template-columns: 1fr;
+    }
+    .chat-section {
+        height: 500px !important;
     }
 }
 
 section {
     background-color: var(--card-bg);
-    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: var(--shadow-subtle);
 }
 
 .section-header {
-    padding: 15px 20px;
+    padding: 20px 25px;
     border-bottom: 1px solid var(--border-color);
-    background-color: rgba(0,0,0,0.02);
+    background-color: rgba(201, 74, 92, 0.03);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+.section-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
 /* الملاحظات */
 .add-note-box {
-    padding: 20px;
+    padding: 25px;
     border-bottom: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.01);
 }
 
 .add-note-box textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--bg-color);
+    padding: 15px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.03);
     color: var(--text-color);
     resize: vertical;
-    min-height: 80px;
-    margin-bottom: 10px;
+    min-height: 100px;
+    margin-bottom: 15px;
     outline: none;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.add-note-box textarea:focus {
+    border-color: var(--primary-color);
 }
 
 .note-actions {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     justify-content: flex-end;
 }
 
 .note-actions select {
-    padding: 8px 15px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-color);
     background-color: var(--bg-color);
     color: var(--text-color);
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
 }
 
 .notes-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    padding: 20px;
+    gap: 25px;
+    padding: 25px;
 }
 
 @media (max-width: 600px) {
@@ -234,18 +366,32 @@ section {
     }
 }
 
+.notes-grid h4 {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: var(--primary-color);
+    border-bottom: 2px dashed var(--border-color);
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
 .notes-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-top: 15px;
 }
 
 .note-card {
-    padding: 15px;
-    border-radius: 12px;
+    padding: 20px;
+    border-radius: 16px;
     border: 1px solid;
     position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.note-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
 .note-card.good {
@@ -261,97 +407,145 @@ section {
 .note-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     font-size: 12px;
-    opacity: 0.8;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.note-card p {
+    font-size: 15px;
+    line-height: 1.6;
 }
 
 .note-delete {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 15px;
+    left: 15px;
     background: transparent;
     color: var(--danger-color);
     border: none;
     padding: 5px;
     font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.note-card:hover .note-delete {
+    opacity: 1;
 }
 
 .note-delete:hover {
-    background-color: var(--bad-border);
+    text-decoration: underline;
+    transform: scale(1.1);
 }
 
 /* الدردشة */
 .chat-section {
-    height: 600px;
+    height: 650px;
 }
 
 .status-dot {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background-color: #22c55e;
     border-radius: 50%;
     animation: pulse 2s infinite;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 
 @keyframes pulse {
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
 .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    scroll-behavior: smooth;
+}
+
+/* تخصيص السكرول بار */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
 }
 
 .message {
-    max-width: 80%;
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-size: 14px;
+    max-width: 75%;
+    padding: 12px 18px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    position: relative;
+    animation: msgFadeIn 0.3s ease-out;
+}
+
+@keyframes msgFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .message.me {
-    align-self: flex-start; /* بما أن الاتجاه RTL */
-    background-color: var(--chat-me);
-    color: white;
-    border-top-right-radius: 2px;
+    align-self: flex-start;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--chat-me-text);
+    border-top-right-radius: 4px;
+    box-shadow: 0 4px 10px rgba(201, 74, 92, 0.2);
 }
 
 .message.other {
     align-self: flex-end;
     background-color: var(--chat-other);
-    border-top-left-radius: 2px;
+    color: var(--chat-other-text);
+    border-top-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
 }
 
 .message-sender {
     font-size: 11px;
-    opacity: 0.7;
-    margin-bottom: 3px;
+    opacity: 0.8;
+    margin-bottom: 5px;
+    font-weight: 700;
 }
 
 .chat-input-box {
-    padding: 15px;
+    padding: 20px;
     border-top: 1px solid var(--border-color);
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    background-color: rgba(0, 0, 0, 0.01);
 }
 
 .chat-input-box input {
     flex: 1;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 15px 20px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 25px;
     background-color: var(--bg-color);
     color: var(--text-color);
     outline: none;
+    font-size: 15px;
+    transition: border-color 0.3s;
 }
 
 .chat-input-box input:focus {
     border-color: var(--primary-color);
+}
+
+.chat-input-box button {
+    border-radius: 25px;
+    padding: 0 25px;
 }

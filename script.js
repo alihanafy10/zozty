@@ -66,7 +66,16 @@ loginBtn.addEventListener('click', () => {
         return;
     }
     
-    currentUser = username;
+    // حماية الدخول لـ Ali و Zoza فقط
+    const allowedUsers = ['ali', 'zoza'];
+    if (!allowedUsers.includes(username.toLowerCase())) {
+        loginError.textContent = 'عذراً، هذا التطبيق (Wateen) مخصص لـ Ali و Zoza فقط ❤️';
+        return;
+    }
+    
+    // لتوحيد شكل الاسم
+    currentUser = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
+    
     loginError.textContent = '';
     displayUsername.textContent = currentUser;
     
