@@ -1,3 +1,22 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDIebUw5V99uD1t99vUBG2P-Nshbd_xrZg",
+  authDomain: "zozo-35b75.firebaseapp.com",
+  // الاحتياط برابط الداتابيز المعتاد تحسباً لأي مشاكل
+  databaseURL: "https://zozo-35b75-default-rtdb.firebaseio.com", 
+  projectId: "zozo-35b75",
+  storageBucket: "zozo-35b75.firebasestorage.app",
+  messagingSenderId: "838568074522",
+  appId: "1:838568074522:web:e7b2d4a4281db5c92020a3",
+  measurementId: "G-L9B7F2291J"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 let currentUser = null;
 
 // =======================
@@ -12,14 +31,12 @@ const loginError = document.getElementById('loginError');
 const displayUsername = document.getElementById('displayUsername');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// الملاحظات
 const noteTextInput = document.getElementById('noteTextInput');
 const noteCategory = document.getElementById('noteCategory');
 const addNoteBtn = document.getElementById('addNoteBtn');
 const myNotesList = document.getElementById('myNotesList');
 const partnerNotesList = document.getElementById('partnerNotesList');
 
-// الدردشة
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendMsgBtn = document.getElementById('sendMsgBtn');
@@ -67,79 +84,66 @@ logoutBtn.addEventListener('click', () => {
 });
 
 // =======================
-// تهيئة التطبيق
+// تهيئة التطبيق (Firebase)
 // =======================
 function initApp() {
-    loadNotes();
-    loadMessages();
-}
+    // الاستماع للملاحظات
+    const notesRef = ref(db, 'notes');
+    onValue(notesRef, (snapshot) => {
+        const data = snapshot.val();
+        const notesArray = [];
+        if (data) {
+            for (let id in data) {
+                notesArray.push({ id, ...data[id] });
+            }
+        }
+        renderNotes(notesArray);
+    });
 
-// الاستماع للتغييرات في localStorage (عشان لو فاتحين تابين مختلفتين)
-window.addEventListener('storage', (e) => {
-    if (e.key === 'app_notes') {
-        loadNotes();
-    }
-    if (e.key === 'app_messages') {
-        loadMessages();
-    }
-});
+    // الاستماع للرسائل
+    const messagesRef = ref(db, 'messages');
+    onValue(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        const messagesArray = [];
+        if (data) {
+            for (let id in data) {
+                messagesArray.push(data[id]);
+            }
+        }
+        renderMessages(messagesArray);
+    });
+}
 
 // =======================
-// نظام الملاحظات (Local Storage DB)
+// نظام الملاحظات
 // =======================
-function getNotesDB() {
-    const data = localStorage.getItem('app_notes');
-    return data ? JSON.parse(data) : [];
-}
-
-function saveNotesDB(notes) {
-    localStorage.setItem('app_notes', JSON.stringify(notes));
-}
-
-function loadNotes() {
-    const notes = getNotesDB();
-    renderNotes(notes);
-}
-
 addNoteBtn.addEventListener('click', () => {
     const text = noteTextInput.value.trim();
     const category = noteCategory.value;
 
     if (!text) return;
 
-    const notes = getNotesDB();
-    const newNote = {
-        id: Date.now().toString(),
+    const notesRef = ref(db, 'notes');
+    push(notesRef, {
         text,
         category,
         owner: currentUser,
         createdAt: new Date().toISOString()
-    };
-    
-    notes.push(newNote);
-    saveNotesDB(notes);
+    });
     
     noteTextInput.value = '';
-    loadNotes();
 });
 
+// اجعل دالة الحذف متاحة للـ HTML (لأن script أصبح module)
 window.deleteNote = function(id) {
     if (!confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) return;
 
-    let notes = getNotesDB();
-    const noteToDelete = notes.find(n => n.id === id);
-    
-    if (noteToDelete && noteToDelete.owner === currentUser) {
-        notes = notes.filter(n => n.id !== id);
-        saveNotesDB(notes);
-        loadNotes();
-    } else {
-        alert('لا يمكنك حذف هذه الملاحظة (غير مصرح)');
-    }
+    const noteRef = ref(db, 'notes/' + id);
+    // لاحظ: في بيئة Firebase يمكن إضافة صلاحيات للحذف من خلال Security Rules
+    remove(noteRef).catch(err => alert("خطأ أثناء الحذف: " + err.message));
 };
 
 function renderNotes(notes) {
-    // ترتيب من الأحدث للأقدم
     notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
     myNotesList.innerHTML = '';
@@ -180,23 +184,8 @@ function renderNotes(notes) {
 }
 
 // =======================
-// نظام الدردشة (Local Storage DB)
+// نظام الدردشة
 // =======================
-function getMessagesDB() {
-    const data = localStorage.getItem('app_messages');
-    return data ? JSON.parse(data) : [];
-}
-
-function saveMessagesDB(messages) {
-    localStorage.setItem('app_messages', JSON.stringify(messages));
-}
-
-function loadMessages() {
-    const messages = getMessagesDB();
-    chatMessages.innerHTML = '';
-    messages.forEach(msg => appendMessage(msg));
-}
-
 sendMsgBtn.addEventListener('click', sendMessage);
 chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
@@ -206,31 +195,35 @@ function sendMessage() {
     const text = chatInput.value.trim();
     if (!text) return;
 
-    const messages = getMessagesDB();
-    const newMsg = {
-        id: Date.now().toString(),
+    const messagesRef = ref(db, 'messages');
+    push(messagesRef, {
         sender: currentUser,
         text: text,
         timestamp: new Date().toISOString()
-    };
-    
-    messages.push(newMsg);
-    saveMessagesDB(messages);
+    });
     
     chatInput.value = '';
-    loadMessages(); // تحديث الواجهة فوراً
 }
 
-function appendMessage(data) {
-    const isMe = data.sender === currentUser;
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `message ${isMe ? 'me' : 'other'}`;
+function renderMessages(messages) {
+    chatMessages.innerHTML = '';
     
-    msgDiv.innerHTML = `
-        <div class="message-sender">${isMe ? 'أنت' : data.sender}</div>
-        <div class="message-text">${data.text}</div>
-    `;
+    // ترتيب الرسائل من الأقدم للأحدث (حسب الإضافة غالباً Firebase بيرجعها مترتبة، لكن زيادة تأكيد)
+    messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    messages.forEach(data => {
+        const isMe = data.sender === currentUser;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${isMe ? 'me' : 'other'}`;
+        
+        msgDiv.innerHTML = `
+            <div class="message-sender">${isMe ? 'أنت' : data.sender}</div>
+            <div class="message-text">${data.text}</div>
+        `;
+        
+        chatMessages.appendChild(msgDiv);
+    });
     
-    chatMessages.appendChild(msgDiv);
+    // التمرير لأسفل
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
