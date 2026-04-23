@@ -418,26 +418,64 @@ section {
     line-height: 1.6;
 }
 
-.note-delete {
+.note-actions-overlay {
     position: absolute;
     top: 15px;
     left: 15px;
-    background: transparent;
-    color: var(--danger-color);
-    border: none;
-    padding: 5px;
-    font-size: 12px;
+    display: flex;
+    gap: 8px;
     opacity: 0;
     transition: opacity 0.3s;
 }
 
-.note-card:hover .note-delete {
+.note-card:hover .note-actions-overlay {
     opacity: 1;
 }
 
+.note-delete, .note-edit {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.note-delete {
+    color: var(--danger-color);
+}
+
 .note-delete:hover {
-    text-decoration: underline;
-    transform: scale(1.1);
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.note-edit:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    margin-top: 10px;
+}
+
+.save-btn-active {
+    background-color: #22c55e !important;
+    color: white !important;
+    border-color: #16a34a !important;
 }
 
 /* الدردشة */

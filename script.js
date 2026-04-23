@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIebUw5V99uD1t99vUBG2P-Nshbd_xrZg",
@@ -155,13 +155,39 @@ addNoteBtn.addEventListener('click', () => {
     noteTextInput.value = '';
 });
 
-// اجعل دالة الحذف متاحة للـ HTML (لأن script أصبح module)
+// اجعل دالة الحذف والتعديل متاحة للـ HTML
 window.deleteNote = function(id) {
     if (!confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) return;
 
     const noteRef = ref(db, 'notes/' + id);
-    // لاحظ: في بيئة Firebase يمكن إضافة صلاحيات للحذف من خلال Security Rules
     remove(noteRef).catch(err => alert("خطأ أثناء الحذف: " + err.message));
+};
+
+window.editNote = function(id) {
+    const textElement = document.getElementById(`note-text-${id}`);
+    const currentText = textElement.textContent;
+    
+    // تحويل النص إلى حقل إدخال
+    textElement.innerHTML = `<textarea id="edit-input-${id}" class="edit-textarea">${currentText}</textarea>`;
+    
+    // تغيير زر التعديل إلى زر حفظ
+    const editBtn = document.getElementById(`edit-btn-${id}`);
+    editBtn.innerHTML = '💾 حفظ';
+    editBtn.setAttribute('onclick', `saveNote('${id}')`);
+    editBtn.classList.add('save-btn-active');
+};
+
+window.saveNote = function(id) {
+    const editInput = document.getElementById(`edit-input-${id}`);
+    const newText = editInput.value.trim();
+    
+    if (!newText) {
+        alert("لا يمكن حفظ ملاحظة فارغة!");
+        return;
+    }
+
+    const noteRef = ref(db, 'notes/' + id);
+    update(noteRef, { text: newText }).catch(err => alert("خطأ أثناء التعديل: " + err.message));
 };
 
 function renderNotes(notes) {
@@ -182,8 +208,13 @@ function renderNotes(notes) {
                 <span>${note.category === 'Good' ? 'إيجابية' : 'سلبية'}</span>
                 <span>${date}</span>
             </div>
-            <p>${note.text}</p>
-            ${isMine ? `<button class="note-delete" onclick="deleteNote('${note.id}')">🗑️ حذف</button>` : ''}
+            <p id="note-text-${note.id}">${note.text}</p>
+            ${isMine ? `
+                <div class="note-actions-overlay">
+                    <button id="edit-btn-${note.id}" class="note-edit" onclick="editNote('${note.id}')">✏️ تعديل</button>
+                    <button class="note-delete" onclick="deleteNote('${note.id}')">🗑️ حذف</button>
+                </div>
+            ` : ''}
         `;
 
         if (isMine) {
