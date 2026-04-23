@@ -1,49 +1,45 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Send } from 'lucide-react';
-import { io } from 'socket.io-client';
 import { API_URL } from '../config';
-
-const socket = io(API_URL);
 
 const ChatBox = ({ currentUser }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const scrollRef = useRef();
 
+  const fetchMessages = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/messages`);
+      setMessages(res.data);
+    } catch (err) {
+      console.error('Error fetching messages', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/messages`);
-        setMessages(res.data);
-      } catch (err) {
-        console.error('Error fetching messages', err);
-      }
-    };
     fetchMessages();
-
-    socket.on('receive_message', (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
-
-    return () => {
-      socket.off('receive_message');
-    };
+    const interval = setInterval(fetchMessages, 3000); // Poll every 3 seconds
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    socket.emit('send_message', {
-      text: newMessage,
-      senderId: currentUser.id
-    });
-    setNewMessage('');
+    try {
+      const msgData = { text: newMessage, senderId: currentUser.id };
+      setNewMessage('');
+      // Optimistic URL Update or direct fetch
+      await axios.post(`${API_URL}/api/messages`, msgData);
+      fetchMessages(); // Immediately pull new message
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -51,7 +47,7 @@ const ChatBox = ({ currentUser }) => {
       <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80">
         <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          Live Chat
+          Live Chat (Vercel Polling)
         </h3>
       </div>
       

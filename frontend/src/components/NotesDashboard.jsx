@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
-import { io } from 'socket.io-client';
 import { API_URL } from '../config';
-
-const socket = io(API_URL);
 
 const NotesDashboard = ({ currentUser }) => {
   const [notes, setNotes] = useState([]);
@@ -23,23 +20,8 @@ const NotesDashboard = ({ currentUser }) => {
 
   useEffect(() => {
     fetchNotes();
-
-    socket.on('note_updated', (updatedNote) => {
-      setNotes((prev) => {
-        const exists = prev.find(n => n._id === updatedNote._id);
-        if (exists) return prev.map(n => n._id === updatedNote._id ? updatedNote : n);
-        return [...prev, updatedNote];
-      });
-    });
-
-    socket.on('note_deleted', (deletedId) => {
-      setNotes((prev) => prev.filter(n => n._id !== deletedId));
-    });
-
-    return () => {
-      socket.off('note_updated');
-      socket.off('note_deleted');
-    };
+    const interval = setInterval(fetchNotes, 4000); // Poll every 4 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const handleCreate = async (e) => {
@@ -48,6 +30,7 @@ const NotesDashboard = ({ currentUser }) => {
     try {
       await axios.post(`${API_URL}/api/notes`, { ...newNote, ownerId: currentUser.id });
       setNewNote({ text: '', category: 'Good' });
+      fetchNotes();
     } catch (err) {
       console.error(err);
     }
@@ -56,6 +39,7 @@ const NotesDashboard = ({ currentUser }) => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${API_URL}/api/notes/${id}?ownerId=${currentUser.id}`);
+      fetchNotes();
     } catch (err) {
       console.error(err);
     }
@@ -70,6 +54,7 @@ const NotesDashboard = ({ currentUser }) => {
     try {
       await axios.put(`${API_URL}/api/notes/${note._id}`, { text: editText, category: note.category, ownerId: currentUser.id });
       setEditingId(null);
+      fetchNotes();
     } catch (err) {
       console.error(err);
     }

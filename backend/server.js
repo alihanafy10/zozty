@@ -1,6 +1,4 @@
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
@@ -10,13 +8,6 @@ const Note = require('./models/Note');
 const Message = require('./models/Message');
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
-  }
-});
 
 app.use(cors());
 app.use(express.json());
@@ -73,7 +64,6 @@ app.post('/api/notes', async (req, res) => {
     const note = new Note({ text, category, owner: ownerId });
     await note.save();
     await note.populate('owner', 'username');
-    io.emit('note_updated', note); // Notify all clients
     res.status(201).json(note);
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -91,7 +81,6 @@ app.put('/api/notes/:id', async (req, res) => {
     note.category = category;
     await note.save();
     await note.populate('owner', 'username');
-    io.emit('note_updated', note);
     res.json(note);
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -106,7 +95,6 @@ app.delete('/api/notes/:id', async (req, res) => {
     if (note.owner.toString() !== ownerId) return res.status(403).json({ error: 'Unauthorized' });
 
     await note.deleteOne();
-    io.emit('note_deleted', req.params.id);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -123,25 +111,18 @@ app.get('/api/messages', async (req, res) => {
   }
 });
 
-// Socket.io Config
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-
-  socket.on('send_message', async (data) => {
-    try {
-      const msg = new Message({ text: data.text, sender: data.senderId });
-      await msg.save();
-      await msg.populate('sender', 'username');
-      io.emit('receive_message', msg);
-    } catch (error) {
-      console.error('Message save error:', error);
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
+app.post('/api/messages', async (req, res) => {
+  try {
+    const msg = new Message({ text: req.body.text, sender: req.body.senderId });
+    await msg.save();
+    await msg.populate('sender', 'username');
+    res.status(201).json(msg);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+module.exports = app;
