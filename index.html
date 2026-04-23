@@ -3,21 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wateen - وتين</title>
-    <!-- Google Fonts: Tajawal -->
+    <title>Wateen</title>
+    <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
+    <!-- Animated Background -->
+    <div class="mesh-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <!-- Theme Toggle -->
     <button id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
 
     <!-- Login Section -->
     <div id="loginSection" class="container">
-        <div class="login-box">
+        <div class="login-box glass-panel">
             <div class="logo-area">
                 <div class="heart-icon">❤️</div>
                 <h2>Wateen</h2>
@@ -32,7 +39,7 @@
 
     <!-- Main App Interface -->
     <div id="mainApp" class="container hidden">
-        <header class="app-header">
+        <header class="app-header glass-panel">
             <div class="brand-title">
                 <span class="heart-icon-small">❤️</span>
                 <h2>Wateen</h2>
@@ -46,7 +53,7 @@
         <div class="app-grid">
             
             <!-- Notes Dashboard -->
-            <section class="notes-section">
+            <section class="notes-section glass-panel">
                 <div class="section-header">
                     <h3>📝 Notes</h3>
                 </div>
@@ -77,7 +84,7 @@
             </section>
 
             <!-- Chat Box -->
-            <section class="chat-section">
+            <section class="chat-section glass-panel">
                 <div class="section-header">
                     <h3>💬 Live Chat</h3>
                     <span class="status-dot"></span>
