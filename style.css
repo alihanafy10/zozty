@@ -421,7 +421,7 @@ section {
 .note-actions-overlay {
     position: absolute;
     top: 15px;
-    left: 15px;
+    right: 15px;
     display: flex;
     gap: 8px;
     opacity: 0;
@@ -536,7 +536,7 @@ section {
 }
 
 .message.me {
-    align-self: flex-start;
+    align-self: flex-end;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
     color: var(--chat-me-text);
     border-top-right-radius: 4px;
@@ -544,7 +544,7 @@ section {
 }
 
 .message.other {
-    align-self: flex-end;
+    align-self: flex-start;
     background-color: var(--chat-other);
     color: var(--chat-other-text);
     border-top-left-radius: 4px;

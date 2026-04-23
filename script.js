@@ -49,13 +49,13 @@ themeToggle.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', newTheme);
-    themeToggle.textContent = newTheme === 'light' ? '🌙 الوضع الليلي' : '☀️ الوضع النهاري';
+    themeToggle.textContent = newTheme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
     localStorage.setItem('theme', newTheme);
 });
 
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);
-themeToggle.textContent = savedTheme === 'light' ? '🌙 الوضع الليلي' : '☀️ الوضع النهاري';
+themeToggle.textContent = savedTheme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
 
 // =======================
 // تسجيل الدخول والخروج
@@ -65,14 +65,14 @@ loginBtn.addEventListener('click', () => {
     const password = passwordInput.value.trim();
     
     if (!username || !password) {
-        loginError.textContent = 'الرجاء إدخال الاسم وكلمة المرور';
+        loginError.textContent = 'Please enter name and password';
         return;
     }
     
     // حماية الدخول لـ Ali و Zoza فقط
     const allowedUsers = ['ali', 'zoza'];
     if (!allowedUsers.includes(username.toLowerCase())) {
-        loginError.textContent = 'عذراً، هذا التطبيق (Wateen) مخصص لـ Ali و Zoza فقط ❤️';
+        loginError.textContent = 'Sorry, this app (Wateen) is only for Ali and Zoza ❤️';
         return;
     }
     
@@ -80,7 +80,7 @@ loginBtn.addEventListener('click', () => {
     // تم تعيين كلمة مرور بسيطة حالياً (يمكنك تغييرها من هنا لاحقاً)
     const validPassword = '123';
     if (password !== validPassword) {
-        loginError.textContent = 'كلمة المرور غير صحيحة 🔒';
+        loginError.textContent = 'Incorrect password 🔒';
         return;
     }
     
@@ -157,10 +157,10 @@ addNoteBtn.addEventListener('click', () => {
 
 // اجعل دالة الحذف والتعديل متاحة للـ HTML
 window.deleteNote = function(id) {
-    if (!confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) return;
+    if (!confirm('Are you sure you want to delete this note?')) return;
 
     const noteRef = ref(db, 'notes/' + id);
-    remove(noteRef).catch(err => alert("خطأ أثناء الحذف: " + err.message));
+    remove(noteRef).catch(err => alert("Error deleting: " + err.message));
 };
 
 window.editNote = function(id) {
@@ -172,7 +172,7 @@ window.editNote = function(id) {
     
     // تغيير زر التعديل إلى زر حفظ
     const editBtn = document.getElementById(`edit-btn-${id}`);
-    editBtn.innerHTML = '💾 حفظ';
+    editBtn.innerHTML = '💾 Save';
     editBtn.setAttribute('onclick', `saveNote('${id}')`);
     editBtn.classList.add('save-btn-active');
 };
@@ -182,12 +182,12 @@ window.saveNote = function(id) {
     const newText = editInput.value.trim();
     
     if (!newText) {
-        alert("لا يمكن حفظ ملاحظة فارغة!");
+        alert("Cannot save an empty note!");
         return;
     }
 
     const noteRef = ref(db, 'notes/' + id);
-    update(noteRef, { text: newText }).catch(err => alert("خطأ أثناء التعديل: " + err.message));
+    update(noteRef, { text: newText }).catch(err => alert("Error saving: " + err.message));
 };
 
 function renderNotes(notes) {
@@ -198,21 +198,21 @@ function renderNotes(notes) {
 
     notes.forEach(note => {
         const isMine = note.owner === currentUser;
-        const date = new Date(note.createdAt).toLocaleDateString('ar-EG');
+        const date = new Date(note.createdAt).toLocaleDateString('en-US');
         
         const card = document.createElement('div');
         card.className = `note-card ${note.category === 'Good' ? 'good' : 'bad'}`;
         
         card.innerHTML = `
             <div class="note-header">
-                <span>${note.category === 'Good' ? 'إيجابية' : 'سلبية'}</span>
+                <span>${note.category === 'Good' ? 'Positive' : 'Negative'}</span>
                 <span>${date}</span>
             </div>
             <p id="note-text-${note.id}">${note.text}</p>
             ${isMine ? `
                 <div class="note-actions-overlay">
-                    <button id="edit-btn-${note.id}" class="note-edit" onclick="editNote('${note.id}')">✏️ تعديل</button>
-                    <button class="note-delete" onclick="deleteNote('${note.id}')">🗑️ حذف</button>
+                    <button id="edit-btn-${note.id}" class="note-edit" onclick="editNote('${note.id}')">✏️ Edit</button>
+                    <button class="note-delete" onclick="deleteNote('${note.id}')">🗑️ Delete</button>
                 </div>
             ` : ''}
         `;
@@ -224,15 +224,15 @@ function renderNotes(notes) {
             ownerSpan.style.fontSize = '11px';
             ownerSpan.style.fontWeight = 'bold';
             ownerSpan.style.marginBottom = '5px';
-            ownerSpan.textContent = `بقلم: ${note.owner}`;
+            ownerSpan.textContent = `By: ${note.owner}`;
             card.insertBefore(ownerSpan, card.firstChild);
             
             partnerNotesList.appendChild(card);
         }
     });
 
-    if (myNotesList.children.length === 0) myNotesList.innerHTML = '<p style="color:#94a3b8; font-size:13px">لا توجد ملاحظات لك.</p>';
-    if (partnerNotesList.children.length === 0) partnerNotesList.innerHTML = '<p style="color:#94a3b8; font-size:13px">لا توجد ملاحظات من الطرف الآخر.</p>';
+    if (myNotesList.children.length === 0) myNotesList.innerHTML = '<p style="color:#94a3b8; font-size:13px">No notes yet.</p>';
+    if (partnerNotesList.children.length === 0) partnerNotesList.innerHTML = '<p style="color:#94a3b8; font-size:13px">No notes from your partner yet.</p>';
 }
 
 // =======================
@@ -269,7 +269,7 @@ function renderMessages(messages) {
         msgDiv.className = `message ${isMe ? 'me' : 'other'}`;
         
         msgDiv.innerHTML = `
-            <div class="message-sender">${isMe ? 'أنت' : data.sender}</div>
+            <div class="message-sender">${isMe ? 'You' : data.sender}</div>
             <div class="message-text">${data.text}</div>
         `;
         

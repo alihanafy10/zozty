@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="en" dir="ltr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,25 +12,25 @@
 </head>
 <body>
     
-    <!-- زر تبديل الوضع (Dark/Light Mode) -->
-    <button id="themeToggle" class="theme-btn">🌙 الوضع الليلي</button>
+    <!-- Theme Toggle -->
+    <button id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
 
-    <!-- شاشة تسجيل الدخول -->
+    <!-- Login Section -->
     <div id="loginSection" class="container">
         <div class="login-box">
             <div class="logo-area">
                 <div class="heart-icon">❤️</div>
                 <h2>Wateen</h2>
             </div>
-            <p>مرحباً بكما في مساحتكم الخاصة</p>
-            <input type="text" id="usernameInput" placeholder="الاسم (Ali أو Zoza)..." />
-            <input type="password" id="passwordInput" placeholder="كلمة المرور..." />
-            <button id="loginBtn" class="primary-btn">دخول</button>
+            <p>Welcome to your private space</p>
+            <input type="text" id="usernameInput" placeholder="Name (Ali or Zoza)..." />
+            <input type="password" id="passwordInput" placeholder="Password..." />
+            <button id="loginBtn" class="primary-btn">Log In</button>
             <div id="loginError" class="error-msg"></div>
         </div>
     </div>
 
-    <!-- الواجهة الرئيسية (دردشة + ملاحظات) -->
+    <!-- Main App Interface -->
     <div id="mainApp" class="container hidden">
         <header class="app-header">
             <div class="brand-title">
@@ -38,58 +38,58 @@
                 <h2>Wateen</h2>
             </div>
             <div class="user-info">
-                <span>مرحباً، <span id="displayUsername"></span></span>
+                <span>Welcome, <span id="displayUsername"></span></span>
             </div>
-            <button id="logoutBtn" class="danger-btn">تسجيل خروج</button>
+            <button id="logoutBtn" class="danger-btn">Log Out</button>
         </header>
 
         <div class="app-grid">
             
-            <!-- لوحة الملاحظات (Notes Dashboard) -->
+            <!-- Notes Dashboard -->
             <section class="notes-section">
                 <div class="section-header">
-                    <h3>📝 الملاحظات</h3>
+                    <h3>📝 Notes</h3>
                 </div>
                 
-                <!-- إضافة ملاحظة جديدة -->
+                <!-- Add New Note -->
                 <div class="add-note-box">
-                    <textarea id="noteTextInput" placeholder="اكتب ملاحظة جديدة هنا..."></textarea>
+                    <textarea id="noteTextInput" placeholder="Write a new note here..."></textarea>
                     <div class="note-actions">
                         <select id="noteCategory">
-                            <option value="Good">إيجابية (Good)</option>
-                            <option value="Bad">سلبية (Bad)</option>
+                            <option value="Good">Positive (Good)</option>
+                            <option value="Bad">Negative (Bad)</option>
                         </select>
-                        <button id="addNoteBtn" class="primary-btn">إضافة ملاحظة</button>
+                        <button id="addNoteBtn" class="primary-btn">Add Note</button>
                     </div>
                 </div>
 
-                <!-- عرض الملاحظات -->
+                <!-- Notes Grid -->
                 <div class="notes-grid">
                     <div class="my-notes">
-                        <h4>ملاحظاتي</h4>
+                        <h4>My Notes</h4>
                         <div id="myNotesList" class="notes-list"></div>
                     </div>
                     <div class="partner-notes">
-                        <h4>ملاحظات الطرف الآخر</h4>
+                        <h4>Partner's Notes</h4>
                         <div id="partnerNotesList" class="notes-list"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- صندوق الدردشة (Chat Box) -->
+            <!-- Chat Box -->
             <section class="chat-section">
                 <div class="section-header">
-                    <h3>💬 الدردشة الفورية</h3>
+                    <h3>💬 Live Chat</h3>
                     <span class="status-dot"></span>
                 </div>
                 
                 <div id="chatMessages" class="chat-messages">
-                    <!-- سيتم إضافة الرسائل هنا -->
+                    <!-- Messages will be added here -->
                 </div>
 
                 <div class="chat-input-box">
-                    <input type="text" id="chatInput" placeholder="اكتب رسالتك..." />
-                    <button id="sendMsgBtn" class="primary-btn">إرسال</button>
+                    <input type="text" id="chatInput" placeholder="Type your message..." />
+                    <button id="sendMsgBtn" class="primary-btn">Send</button>
                 </div>
             </section>
         </div>
