@@ -26,6 +26,7 @@ const themeToggle = document.getElementById('themeToggle');
 const loginSection = document.getElementById('loginSection');
 const mainApp = document.getElementById('mainApp');
 const usernameInput = document.getElementById('usernameInput');
+const passwordInput = document.getElementById('passwordInput');
 const loginBtn = document.getElementById('loginBtn');
 const loginError = document.getElementById('loginError');
 const displayUsername = document.getElementById('displayUsername');
@@ -61,8 +62,10 @@ themeToggle.textContent = savedTheme === 'light' ? '🌙 الوضع الليلي
 // =======================
 loginBtn.addEventListener('click', () => {
     const username = usernameInput.value.trim();
-    if (!username) {
-        loginError.textContent = 'الرجاء إدخال اسم المستخدم';
+    const password = passwordInput.value.trim();
+    
+    if (!username || !password) {
+        loginError.textContent = 'الرجاء إدخال الاسم وكلمة المرور';
         return;
     }
     
@@ -70,6 +73,14 @@ loginBtn.addEventListener('click', () => {
     const allowedUsers = ['ali', 'zoza'];
     if (!allowedUsers.includes(username.toLowerCase())) {
         loginError.textContent = 'عذراً، هذا التطبيق (Wateen) مخصص لـ Ali و Zoza فقط ❤️';
+        return;
+    }
+    
+    // التحقق من كلمة المرور
+    // تم تعيين كلمة مرور بسيطة حالياً (يمكنك تغييرها من هنا لاحقاً)
+    const validPassword = '123';
+    if (password !== validPassword) {
+        loginError.textContent = 'كلمة المرور غير صحيحة 🔒';
         return;
     }
     
@@ -90,6 +101,7 @@ logoutBtn.addEventListener('click', () => {
     mainApp.classList.add('hidden');
     loginSection.classList.remove('hidden');
     usernameInput.value = '';
+    passwordInput.value = '';
 });
 
 // =======================
