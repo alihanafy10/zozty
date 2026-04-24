@@ -778,6 +778,12 @@ section {
         padding: 20px;
     }
 
+    /* Make Edit/Delete buttons always visible on mobile */
+    .note-actions-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     .chat-section {
         height: 600px;
     }
