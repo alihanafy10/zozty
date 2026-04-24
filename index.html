@@ -63,10 +63,13 @@
                 <div class="add-note-box">
                     <textarea id="noteTextInput" placeholder="Write a new note here..."></textarea>
                     <div class="note-actions">
-                        <select id="noteCategory">
-                            <option value="Good">Positive (Good)</option>
-                            <option value="Bad">Negative (Bad)</option>
-                        </select>
+                        <div class="category-toggle">
+                            <input type="radio" id="catGood" name="noteCat" value="Good" checked>
+                            <label for="catGood" class="cat-btn good-btn">😊 Good</label>
+                            
+                            <input type="radio" id="catBad" name="noteCat" value="Bad">
+                            <label for="catBad" class="cat-btn bad-btn">😔 Bad</label>
+                        </div>
                         <button id="addNoteBtn" class="primary-btn">Add Note</button>
                     </div>
                 </div>

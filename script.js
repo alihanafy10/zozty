@@ -42,7 +42,6 @@ function getAvatar(name) {
 const logoutBtn = document.getElementById('logoutBtn');
 
 const noteTextInput = document.getElementById('noteTextInput');
-const noteCategory = document.getElementById('noteCategory');
 const addNoteBtn = document.getElementById('addNoteBtn');
 const myNotesList = document.getElementById('myNotesList');
 const partnerNotesList = document.getElementById('partnerNotesList');
@@ -150,7 +149,7 @@ function initApp() {
 // =======================
 addNoteBtn.addEventListener('click', () => {
     const text = noteTextInput.value.trim();
-    const category = noteCategory.value;
+    const category = document.querySelector('input[name="noteCat"]:checked').value;
 
     if (!text) return;
 
