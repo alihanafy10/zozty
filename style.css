@@ -380,8 +380,24 @@ button:active {
 }
 
 .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-size: 18px;
     color: var(--text-muted);
+}
+
+.header-avatar {
+    font-size: 24px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 #displayUsername {
@@ -675,6 +691,13 @@ section {
     letter-spacing: 0.5px;
     margin-bottom: 6px;
     opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.chat-avatar {
+    font-size: 16px;
 }
 
 .chat-input-box {

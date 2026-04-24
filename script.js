@@ -30,6 +30,15 @@ const passwordInput = document.getElementById('passwordInput');
 const loginBtn = document.getElementById('loginBtn');
 const loginError = document.getElementById('loginError');
 const displayUsername = document.getElementById('displayUsername');
+const userAvatar = document.getElementById('userAvatar');
+
+function getAvatar(name) {
+    if (!name) return '👤';
+    const lowerName = name.toLowerCase();
+    if (lowerName === 'ali') return '🐺';
+    if (lowerName === 'zoza') return '🐝';
+    return '👤';
+}
 const logoutBtn = document.getElementById('logoutBtn');
 
 const noteTextInput = document.getElementById('noteTextInput');
@@ -89,6 +98,7 @@ loginBtn.addEventListener('click', () => {
     
     loginError.textContent = '';
     displayUsername.textContent = currentUser;
+    userAvatar.textContent = getAvatar(currentUser);
     
     loginSection.classList.add('hidden');
     mainApp.classList.remove('hidden');
@@ -268,8 +278,12 @@ function renderMessages(messages) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${isMe ? 'me' : 'other'}`;
         
+        const avatar = getAvatar(data.sender);
         msgDiv.innerHTML = `
-            <div class="message-sender">${isMe ? 'You' : data.sender}</div>
+            <div class="message-sender">
+                <span class="chat-avatar">${avatar}</span>
+                ${isMe ? 'You' : data.sender}
+            </div>
             <div class="message-text">${data.text}</div>
         `;
         
