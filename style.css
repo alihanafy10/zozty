@@ -702,3 +702,127 @@ section {
     box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1);
     background: rgba(255,255,255,0.08);
 }
+
+/* =========================================
+   Responsive Design (Mobile & Tablets)
+   ========================================= */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 10px;
+    }
+
+    .theme-btn {
+        top: 15px;
+        right: 15px;
+        padding: 8px 16px;
+        font-size: 13px;
+        z-index: 1000;
+    }
+
+    .login-box {
+        padding: 40px 20px;
+    }
+
+    .login-box h2 {
+        font-size: 28px;
+    }
+
+    .app-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+        text-align: center;
+        border-radius: 20px;
+    }
+
+    .brand-title {
+        justify-content: center;
+    }
+
+    .user-info {
+        font-size: 16px;
+    }
+
+    #logoutBtn {
+        width: 100%;
+    }
+
+    .section-header {
+        padding: 15px 20px;
+    }
+
+    .add-note-box {
+        padding: 20px;
+    }
+
+    .add-note-box textarea {
+        min-height: 100px;
+        padding: 15px;
+    }
+
+    .note-actions {
+        flex-direction: column;
+    }
+
+    .note-actions select, .note-actions button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .notes-grid {
+        padding: 20px;
+        gap: 25px;
+    }
+
+    .note-card {
+        padding: 20px;
+    }
+
+    .chat-section {
+        height: 600px;
+    }
+
+    .chat-messages {
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .message {
+        max-width: 88%;
+        padding: 14px 18px;
+        font-size: 14px;
+    }
+
+    .chat-input-box {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .chat-input-box input {
+        padding: 14px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-box h2 {
+        font-size: 24px;
+    }
+
+    .chat-section {
+        height: 500px;
+    }
+    
+    .chat-input-box {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .chat-input-box input {
+        padding: 12px 16px;
+    }
+
+    #sendMsgBtn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
