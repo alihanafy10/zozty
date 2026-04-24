@@ -2,15 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/fireba
 import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDIebUw5V99uD1t99vUBG2P-Nshbd_xrZg",
-  authDomain: "zozo-35b75.firebaseapp.com",
-  // الاحتياط برابط الداتابيز المعتاد تحسباً لأي مشاكل
-  databaseURL: "https://zozo-35b75-default-rtdb.firebaseio.com", 
-  projectId: "zozo-35b75",
-  storageBucket: "zozo-35b75.firebasestorage.app",
-  messagingSenderId: "838568074522",
-  appId: "1:838568074522:web:e7b2d4a4281db5c92020a3",
-  measurementId: "G-L9B7F2291J"
+    apiKey: "AIzaSyDIebUw5V99uD1t99vUBG2P-Nshbd_xrZg",
+    authDomain: "zozo-35b75.firebaseapp.com",
+    // الاحتياط برابط الداتابيز المعتاد تحسباً لأي مشاكل
+    databaseURL: "https://zozo-35b75-default-rtdb.firebaseio.com",
+    projectId: "zozo-35b75",
+    storageBucket: "zozo-35b75.firebasestorage.app",
+    messagingSenderId: "838568074522",
+    appId: "1:838568074522:web:e7b2d4a4281db5c92020a3",
+    measurementId: "G-L9B7F2291J"
 };
 
 // Initialize Firebase
@@ -72,19 +72,19 @@ themeToggle.textContent = savedTheme === 'light' ? '🌙 Dark Mode' : '☀️ Li
 loginBtn.addEventListener('click', () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
-    
+
     if (!username || !password) {
         loginError.textContent = 'Please enter name and password';
         return;
     }
-    
+
     // حماية الدخول لـ Ali و Zoza فقط
     const allowedUsers = ['ali', 'zoza'];
     if (!allowedUsers.includes(username.toLowerCase())) {
         loginError.textContent = 'Sorry, this app (Wateen) is only for Ali and Zoza ❤️';
         return;
     }
-    
+
     // التحقق من كلمة المرور
     // تم تعيين كلمة مرور بسيطة حالياً (يمكنك تغييرها من هنا لاحقاً)
     const validPassword = '123';
@@ -92,14 +92,14 @@ loginBtn.addEventListener('click', () => {
         loginError.textContent = 'Incorrect password 🔒';
         return;
     }
-    
+
     // لتوحيد شكل الاسم
     currentUser = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
-    
+
     loginError.textContent = '';
     displayUsername.textContent = currentUser;
     userAvatar.innerHTML = getAvatar(currentUser);
-    
+
     loginSection.classList.add('hidden');
     mainApp.classList.remove('hidden');
 
@@ -161,25 +161,25 @@ addNoteBtn.addEventListener('click', () => {
         owner: currentUser,
         createdAt: new Date().toISOString()
     });
-    
+
     noteTextInput.value = '';
 });
 
 // اجعل دالة الحذف والتعديل متاحة للـ HTML
-window.deleteNote = function(id) {
+window.deleteNote = function (id) {
     if (!confirm('Are you sure you want to delete this note?')) return;
 
     const noteRef = ref(db, 'notes/' + id);
     remove(noteRef).catch(err => alert("Error deleting: " + err.message));
 };
 
-window.editNote = function(id) {
+window.editNote = function (id) {
     const textElement = document.getElementById(`note-text-${id}`);
     const currentText = textElement.textContent;
-    
+
     // تحويل النص إلى حقل إدخال
     textElement.innerHTML = `<textarea id="edit-input-${id}" class="edit-textarea">${currentText}</textarea>`;
-    
+
     // تغيير زر التعديل إلى زر حفظ
     const editBtn = document.getElementById(`edit-btn-${id}`);
     editBtn.innerHTML = '💾 Save';
@@ -187,10 +187,10 @@ window.editNote = function(id) {
     editBtn.classList.add('save-btn-active');
 };
 
-window.saveNote = function(id) {
+window.saveNote = function (id) {
     const editInput = document.getElementById(`edit-input-${id}`);
     const newText = editInput.value.trim();
-    
+
     if (!newText) {
         alert("Cannot save an empty note!");
         return;
@@ -202,17 +202,17 @@ window.saveNote = function(id) {
 
 function renderNotes(notes) {
     notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+
     myNotesList.innerHTML = '';
     partnerNotesList.innerHTML = '';
 
     notes.forEach(note => {
         const isMine = note.owner === currentUser;
         const date = new Date(note.createdAt).toLocaleDateString('en-US');
-        
+
         const card = document.createElement('div');
         card.className = `note-card ${note.category === 'Good' ? 'good' : 'bad'}`;
-        
+
         card.innerHTML = `
             <div class="note-header">
                 <span>${note.category === 'Good' ? 'Positive' : 'Negative'}</span>
@@ -236,7 +236,7 @@ function renderNotes(notes) {
             ownerSpan.style.marginBottom = '5px';
             ownerSpan.textContent = `By: ${note.owner}`;
             card.insertBefore(ownerSpan, card.firstChild);
-            
+
             partnerNotesList.appendChild(card);
         }
     });
@@ -263,13 +263,13 @@ function sendMessage() {
         text: text,
         timestamp: new Date().toISOString()
     });
-    
+
     chatInput.value = '';
 }
 
 function renderMessages(messages) {
     chatMessages.innerHTML = '';
-    
+
     // ترتيب الرسائل من الأقدم للأحدث (حسب الإضافة غالباً Firebase بيرجعها مترتبة، لكن زيادة تأكيد)
     messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
@@ -277,7 +277,7 @@ function renderMessages(messages) {
         const isMe = data.sender === currentUser;
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${isMe ? 'me' : 'other'}`;
-        
+
         const avatar = getAvatar(data.sender);
         msgDiv.innerHTML = `
             <div class="message-sender">
@@ -286,10 +286,10 @@ function renderMessages(messages) {
             </div>
             <div class="message-text">${data.text}</div>
         `;
-        
+
         chatMessages.appendChild(msgDiv);
     });
-    
+
     // التمرير لأسفل
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
