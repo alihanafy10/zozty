@@ -35,8 +35,8 @@ const userAvatar = document.getElementById('userAvatar');
 function getAvatar(name) {
     if (!name) return '👤';
     const lowerName = name.toLowerCase();
-    if (lowerName === 'ali') return '🐺';
-    if (lowerName === 'zoza') return '🐝';
+    if (lowerName === 'ali') return '<img src="assets/wolf.png" class="avatar-img" alt="Ali" />';
+    if (lowerName === 'zoza') return '<img src="assets/bee.png" class="avatar-img" alt="Zoza" />';
     return '👤';
 }
 const logoutBtn = document.getElementById('logoutBtn');
@@ -98,7 +98,7 @@ loginBtn.addEventListener('click', () => {
     
     loginError.textContent = '';
     displayUsername.textContent = currentUser;
-    userAvatar.textContent = getAvatar(currentUser);
+    userAvatar.innerHTML = getAvatar(currentUser);
     
     loginSection.classList.add('hidden');
     mainApp.classList.remove('hidden');
