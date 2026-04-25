@@ -45,7 +45,7 @@ async function initializeFCM() {
         // احصل على توكن FCM
         try {
             const token = await getToken(messaging, {
-                vapidKey: 'BHIwhpoudYaUd63816qoq_hKH0hCFLJDL7bLhiyr-k3XYstBvumimG_12KZfBp0JZIXTq6m25mvf_iI1e1I9vcA'
+                vapidKey: 'BN5BkZ7wPEEMQNrUhxc3KnLQ6FGt_Q_n6qZrYPRXVg-FvHwRxQI_XwXkZJJbLVzqDwXqOiXNBY-f7Ng5VXxDBD0'
             });
 
             if (token) {
@@ -140,6 +140,7 @@ const notesFilterButtons = document.querySelectorAll('.notes-filter-btn');
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendMsgBtn = document.getElementById('sendMsgBtn');
+const rememberMe = document.getElementById('rememberMe');
 const noteFilters = {
     mine: 'all',
     partner: 'all'
@@ -152,6 +153,45 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
+
+// =======================
+// حفظ واستعادة تسجيل الدخول
+// =======================
+function loadSavedLogin() {
+    const saved = localStorage.getItem('wateen-saved-login');
+    if (saved) {
+        try {
+            const { username, remember } = JSON.parse(saved);
+            if (remember && username) {
+                usernameInput.value = username;
+                rememberMe.checked = true;
+                console.log('✅ Loaded saved login:', username);
+            }
+        } catch (error) {
+            console.error('Error loading saved login:', error);
+        }
+    }
+}
+
+function saveLogin(username, shouldRemember) {
+    if (shouldRemember) {
+        localStorage.setItem('wateen-saved-login', JSON.stringify({
+            username,
+            remember: true,
+            timestamp: new Date().toISOString()
+        }));
+        console.log('✅ Login saved:', username);
+    } else {
+        localStorage.removeItem('wateen-saved-login');
+        console.log('✅ Login cleared');
+    }
+}
+
+// تحميل البيانات المحفوظة عند فتح الصفحة
+window.addEventListener('load', () => {
+    loadSavedLogin();
+});
+
 
 // =======================
 // Dark/Light Mode
@@ -198,6 +238,9 @@ loginBtn.addEventListener('click', () => {
     // لتوحيد شكل الاسم
     currentUser = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
 
+    // حفظ تسجيل الدخول إذا كان Remember Me مختار
+    saveLogin(username, rememberMe.checked);
+
     loginError.textContent = '';
     displayUsername.textContent = currentUser;
     userAvatar.innerHTML = getAvatar(currentUser);
@@ -210,11 +253,15 @@ loginBtn.addEventListener('click', () => {
 });
 
 logoutBtn.addEventListener('click', () => {
+    // حذف بيانات تسجيل الدخول المحفوظة عند الخروج
+    saveLogin('', false);
+    
     currentUser = null;
     mainApp.classList.add('hidden');
     loginSection.classList.remove('hidden');
     usernameInput.value = '';
     passwordInput.value = '';
+    rememberMe.checked = false;
 });
 
 // =======================
