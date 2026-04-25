@@ -38,14 +38,21 @@ async function initializeFCM() {
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
                 console.log('⚠️ Notification permission denied');
+                console.warn('⚠️ Android: Go to Settings > Notifications > Allow notifications');
                 return;
             }
         }
+        console.log('✅ Notification permission:', Notification.permission);
 
         // احصل على توكن FCM
         try {
+            console.log('🔄 Requesting FCM token...');
             const token = await getToken(messaging, {
                 vapidKey: 'BN5BkZ7wPEEMQNrUhxc3KnLQ6FGt_Q_n6qZrYPRXVg-FvHwRxQI_XwXkZJJbLVzqDwXqOiXNBY-f7Ng5VXxDBD0'
+            }).catch(error => {
+                console.error('❌ FCM Token Error:', error);
+                console.warn('⚠️ Android: Ensure HTTP/HTTPS is properly configured, or enable notifications manually');
+                throw error;
             });
 
             if (token) {
@@ -102,6 +109,22 @@ if ('serviceWorker' in navigator) {
         }
     });
 }
+
+// مسح النوتفكيشنز عند استئناف التطبيق من الخلفية
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && currentUser) {
+        console.log('👁️ App became visible - clearing notifications');
+        clearAllNotifications();
+    }
+});
+
+// مسح النوتفكيشنز عند إعادة التركيز على النافذة
+window.addEventListener('focus', () => {
+    if (currentUser) {
+        console.log('🔄 Window focused - clearing notifications');
+        clearAllNotifications();
+    }
+});
 
 let latestMessages = [];
 let notesHydrated = false;
@@ -248,6 +271,9 @@ loginBtn.addEventListener('click', () => {
     loginSection.classList.add('hidden');
     mainApp.classList.remove('hidden');
 
+    // مسح أي نوتفكيشنز مفتوحة
+    clearAllNotifications();
+
     initApp();
     initializeFCM();
 });
@@ -267,6 +293,20 @@ logoutBtn.addEventListener('click', () => {
 // =======================
 // Helper Functions for Notifications
 // =======================
+
+// مسح جميع النوتفكيشنز المفتوحة
+async function clearAllNotifications() {
+    try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+            const notifications = await registration.getNotifications();
+            console.log(`🗑️ Clearing ${notifications.length} notifications`);
+            notifications.forEach(notification => notification.close());
+        }
+    } catch (error) {
+        console.error('❌ Error clearing notifications:', error);
+    }
+}
 
 async function setExternalBadge(count) {
     if ('setAppBadge' in navigator && 'clearAppBadge' in navigator) {

@@ -134,20 +134,31 @@ self.addEventListener("notificationclick", (event) => {
   console.log("👆 Notification clicked");
   event.notification.close();
 
+  // امسح جميع النوتفكيشنز عند النقر
   event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      // إذا كان التطبيق مفتوحاً بالفعل، ركّز عليه
-      for (let client of clientList) {
-        if (client.url === "/" || client.url.includes("index.html")) {
-          console.log("✅ Focusing existing window");
-          return client.focus();
+    self.registration.getNotifications().then((notifications) => {
+      notifications.forEach(notification => {
+        if (notification.tag === "wateen-fcm-notification") {
+          notification.close();
+          console.log("🗑️ Cleared notification");
         }
-      }
-      // وإلا افتح النافذة
-      console.log("✅ Opening new window");
-      if (clients.openWindow) {
-        return clients.openWindow("./");
-      }
+      });
+      
+      // ركّز على النافذة أو افتحها
+      return clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+        // إذا كان التطبيق مفتوحاً بالفعل، ركّز عليه
+        for (let client of clientList) {
+          if (client.url === "/" || client.url.includes("index.html")) {
+            console.log("✅ Focusing existing window");
+            return client.focus();
+          }
+        }
+        // وإلا افتح النافذة
+        console.log("✅ Opening new window");
+        if (clients.openWindow) {
+          return clients.openWindow("./");
+        }
+      });
     })
   );
 });
