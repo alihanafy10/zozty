@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDIebUw5V99uD1t99vUBG2P-Nshbd_xrZg",
@@ -18,6 +18,8 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let currentUser = null;
+let appInitialized = false;
+let latestNotes = [];
 
 // =======================
 // عناصر الـ DOM
@@ -45,10 +47,23 @@ const noteTextInput = document.getElementById('noteTextInput');
 const addNoteBtn = document.getElementById('addNoteBtn');
 const myNotesList = document.getElementById('myNotesList');
 const partnerNotesList = document.getElementById('partnerNotesList');
+const notesFilterButtons = document.querySelectorAll('.notes-filter-btn');
 
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendMsgBtn = document.getElementById('sendMsgBtn');
+const noteFilters = {
+    mine: 'all',
+    partner: 'all'
+};
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch((err) => {
+            console.error('Service worker registration failed:', err);
+        });
+    });
+}
 
 // =======================
 // Dark/Light Mode
@@ -117,6 +132,9 @@ logoutBtn.addEventListener('click', () => {
 // تهيئة التطبيق (Firebase)
 // =======================
 function initApp() {
+    if (appInitialized) return;
+    appInitialized = true;
+
     // الاستماع للملاحظات
     const notesRef = ref(db, 'notes');
     onValue(notesRef, (snapshot) => {
@@ -127,6 +145,7 @@ function initApp() {
                 notesArray.push({ id, ...data[id] });
             }
         }
+        latestNotes = notesArray;
         renderNotes(notesArray);
     });
 
@@ -137,12 +156,76 @@ function initApp() {
         const messagesArray = [];
         if (data) {
             for (let id in data) {
-                messagesArray.push(data[id]);
+                messagesArray.push({ id, ...data[id] });
             }
         }
         renderMessages(messagesArray);
     });
 }
+
+function getLikeCount(likes) {
+    if (!likes) return 0;
+    return Object.values(likes).filter(Boolean).length;
+}
+
+function hasLiked(likes) {
+    if (!currentUser || !likes) return false;
+    return Boolean(likes[currentUser]);
+}
+
+function formatMessageTimestamp(timestamp) {
+    if (!timestamp) return '';
+
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return '';
+
+    const day = date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+    const time = date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit'
+    });
+
+    return `${day} at ${time}`;
+}
+
+function toggleLike(path) {
+    if (!currentUser) return;
+
+    const likeRef = ref(db, `${path}/likes/${currentUser}`);
+    runTransaction(likeRef, (liked) => (liked ? null : true)).catch((err) => {
+        alert("Error updating like: " + err.message);
+    });
+}
+
+function matchesNoteFilter(note, filter) {
+    if (filter === 'all') return true;
+    if (filter === 'good') return note.category === 'Good';
+    if (filter === 'bad') return note.category === 'Bad';
+    return true;
+}
+
+function updateNotesFilterButtons() {
+    notesFilterButtons.forEach((button) => {
+        const owner = button.dataset.owner;
+        const filter = button.dataset.filter;
+        button.classList.toggle('active', noteFilters[owner] === filter);
+    });
+}
+
+notesFilterButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const owner = button.dataset.owner;
+        const filter = button.dataset.filter;
+
+        noteFilters[owner] = filter;
+        updateNotesFilterButtons();
+        renderNotes(latestNotes);
+    });
+});
 
 // =======================
 // نظام الملاحظات
@@ -199,15 +282,14 @@ window.saveNote = function (id) {
     update(noteRef, { text: newText }).catch(err => alert("Error saving: " + err.message));
 };
 
-function renderNotes(notes) {
-    notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+window.toggleNoteLike = function (id) {
+    toggleLike(`notes/${id}`);
+};
 
-    myNotesList.innerHTML = '';
-    partnerNotesList.innerHTML = '';
-
-    notes.forEach(note => {
-        const isMine = note.owner === currentUser;
+function createNoteCard(note, isMine) {
         const date = new Date(note.createdAt).toLocaleDateString('en-US');
+        const likesCount = getLikeCount(note.likes);
+        const likedByMe = hasLiked(note.likes);
 
         const card = document.createElement('div');
         card.className = `note-card ${note.category === 'Good' ? 'good' : 'bad'}`;
@@ -218,6 +300,12 @@ function renderNotes(notes) {
                 <span>${date}</span>
             </div>
             <p id="note-text-${note.id}">${note.text}</p>
+            <div class="item-footer">
+                <button class="like-btn ${likedByMe ? 'liked' : ''}" onclick="toggleNoteLike('${note.id}')">
+                    <span class="like-label">${likedByMe ? '&#10084; Liked' : '&#10084; Like'}</span>
+                    <span class="like-count">${likesCount}</span>
+                </button>
+            </div>
             ${isMine ? `
                 <div class="note-actions-overlay">
                     <button id="edit-btn-${note.id}" class="note-edit" onclick="editNote('${note.id}')">✏️ Edit</button>
@@ -227,7 +315,7 @@ function renderNotes(notes) {
         `;
 
         if (isMine) {
-            myNotesList.appendChild(card);
+            return card;
         } else {
             const ownerSpan = document.createElement('div');
             ownerSpan.style.fontSize = '11px';
@@ -235,14 +323,42 @@ function renderNotes(notes) {
             ownerSpan.style.marginBottom = '5px';
             ownerSpan.textContent = `By: ${note.owner}`;
             card.insertBefore(ownerSpan, card.firstChild);
-
-            partnerNotesList.appendChild(card);
+            return card;
         }
-    });
-
-    if (myNotesList.children.length === 0) myNotesList.innerHTML = '<p style="color:#94a3b8; font-size:13px">No notes yet.</p>';
-    if (partnerNotesList.children.length === 0) partnerNotesList.innerHTML = '<p style="color:#94a3b8; font-size:13px">No notes from your partner yet.</p>';
 }
+
+function renderNoteColumn(notes, listElement, emptyText, isMine) {
+    listElement.innerHTML = '';
+
+    if (notes.length === 0) {
+        listElement.innerHTML = `<p style="color:#94a3b8; font-size:13px">${emptyText}</p>`;
+        return;
+    }
+
+    notes.forEach((note) => {
+        listElement.appendChild(createNoteCard(note, isMine));
+    });
+}
+
+function renderNotes(notes) {
+    notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const myNotes = notes.filter((note) => note.owner === currentUser);
+    const partnerNotes = notes.filter((note) => note.owner !== currentUser);
+
+    const filteredMyNotes = myNotes.filter((note) => matchesNoteFilter(note, noteFilters.mine));
+    const filteredPartnerNotes = partnerNotes.filter((note) => matchesNoteFilter(note, noteFilters.partner));
+
+    const myEmptyText = noteFilters.mine === 'all' ? 'No notes yet.' : 'No notes match this filter yet.';
+    const partnerEmptyText = noteFilters.partner === 'all'
+        ? 'No notes from your partner yet.'
+        : 'No partner notes match this filter yet.';
+
+    renderNoteColumn(filteredMyNotes, myNotesList, myEmptyText, true);
+    renderNoteColumn(filteredPartnerNotes, partnerNotesList, partnerEmptyText, false);
+}
+
+updateNotesFilterButtons();
 
 // =======================
 // نظام الدردشة
@@ -266,6 +382,10 @@ function sendMessage() {
     chatInput.value = '';
 }
 
+window.toggleMessageLike = function (id) {
+    toggleLike(`messages/${id}`);
+};
+
 function renderMessages(messages) {
     chatMessages.innerHTML = '';
 
@@ -274,6 +394,9 @@ function renderMessages(messages) {
 
     messages.forEach(data => {
         const isMe = data.sender === currentUser;
+        const likesCount = getLikeCount(data.likes);
+        const likedByMe = hasLiked(data.likes);
+        const sentAt = formatMessageTimestamp(data.timestamp);
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${isMe ? 'me' : 'other'}`;
 
@@ -284,6 +407,13 @@ function renderMessages(messages) {
                 ${isMe ? 'You' : data.sender}
             </div>
             <div class="message-text">${data.text}</div>
+            <div class="message-footer">
+                <span class="message-time">${sentAt}</span>
+                <button class="like-btn ${likedByMe ? 'liked' : ''}" onclick="toggleMessageLike('${data.id}')">
+                    <span class="like-label">${likedByMe ? '&#10084; Liked' : '&#10084; Like'}</span>
+                    <span class="like-count">${likesCount}</span>
+                </button>
+            </div>
         `;
 
         chatMessages.appendChild(msgDiv);

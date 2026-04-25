@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f43f5e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Wateen">
     <title>Wateen</title>
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.webmanifest?v=1">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     
@@ -77,11 +84,25 @@
                 <!-- Notes Grid -->
                 <div class="notes-grid">
                     <div class="my-notes">
-                        <h4>My Notes</h4>
+                        <div class="notes-panel-header">
+                            <h4>My Notes</h4>
+                            <div class="notes-toolbar">
+                                <button class="notes-filter-btn active" data-owner="mine" data-filter="all" type="button">All</button>
+                                <button class="notes-filter-btn" data-owner="mine" data-filter="good" type="button">Good</button>
+                                <button class="notes-filter-btn" data-owner="mine" data-filter="bad" type="button">Bad</button>
+                            </div>
+                        </div>
                         <div id="myNotesList" class="notes-list"></div>
                     </div>
                     <div class="partner-notes">
-                        <h4>Partner's Notes</h4>
+                        <div class="notes-panel-header">
+                            <h4>Partner's Notes</h4>
+                            <div class="notes-toolbar">
+                                <button class="notes-filter-btn active" data-owner="partner" data-filter="all" type="button">All</button>
+                                <button class="notes-filter-btn" data-owner="partner" data-filter="good" type="button">Good</button>
+                                <button class="notes-filter-btn" data-owner="partner" data-filter="bad" type="button">Bad</button>
+                            </div>
+                        </div>
                         <div id="partnerNotesList" class="notes-list"></div>
                     </div>
                 </div>
@@ -106,6 +127,6 @@
         </div>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="script.js?v=3"></script>
 </body>
 </html>
