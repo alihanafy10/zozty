@@ -247,6 +247,65 @@ button:active {
     background: var(--glass-border);
 }
 
+.install-app-btn {
+    position: fixed;
+    right: 30px;
+    bottom: 28px;
+    padding: 12px 18px;
+    background: var(--accent-gradient);
+    color: white;
+    box-shadow: 0 14px 28px rgba(244, 63, 94, 0.28);
+    z-index: 140;
+}
+
+.install-app-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 34px rgba(244, 63, 94, 0.34);
+}
+
+.install-hint {
+    position: fixed;
+    right: 30px;
+    bottom: 92px;
+    width: min(320px, calc(100vw - 32px));
+    padding: 18px 18px 16px;
+    z-index: 140;
+}
+
+.install-hint-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.install-hint-header strong {
+    font-size: 15px;
+}
+
+.install-hint p {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.install-hint-close {
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    font-size: 18px;
+    line-height: 1;
+    box-shadow: none;
+}
+
+.install-hint-close:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
 /* =========================================
    Login Section
    ========================================= */
@@ -968,6 +1027,20 @@ section {
         padding: 8px 16px;
         font-size: 13px;
         z-index: 1000;
+    }
+
+    .install-app-btn {
+        right: 15px;
+        bottom: 16px;
+        padding: 11px 16px;
+        font-size: 13px;
+    }
+
+    .install-hint {
+        right: 15px;
+        bottom: 76px;
+        width: min(320px, calc(100vw - 24px));
+        padding: 16px;
     }
 
     .login-box {
