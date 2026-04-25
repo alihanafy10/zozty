@@ -45,7 +45,7 @@ async function initializeFCM() {
         // احصل على توكن FCM
         try {
             const token = await getToken(messaging, {
-                vapidKey: 'BN5BkZ7wPEEMQNrUhxc3KnLQ6FGt_Q_n6qZrYPRXVg-FvHwRxQI_XwXkZJJbLVzqDwXqOiXNBY-f7Ng5VXxDBD0'
+                vapidKey: 'BHIwhpoudYaUd63816qoq_hKH0hCFLJDL7bLhiyr-k3XYstBvumimG_12KZfBp0JZIXTq6m25mvf_iI1e1I9vcA'
             });
 
             if (token) {
