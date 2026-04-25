@@ -65,3 +65,89 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
+// =======================
+// Firebase Cloud Messaging Handler
+// =======================
+
+self.addEventListener("push", (event) => {
+  console.log("🔔 Push event received in Service Worker");
+  
+  if (!event.data) {
+    console.log("Push received with no data");
+    return;
+  }
+
+  try {
+    const data = event.data.json();
+    console.log("📨 FCM Push received:", data);
+
+    const notificationTitle = data.notification?.title || "Wateen";
+    const notificationOptions = {
+      body: data.notification?.body || "New notification from Wateen",
+      icon: "./assets/icons/icon-192.png",
+      badge: "./assets/icons/icon-192.png",
+      tag: "wateen-fcm-notification",
+      requireInteraction: true,
+      data: data.data || {}
+    };
+
+    console.log("📣 Showing notification:", notificationTitle);
+
+    // عرض الإخطار
+    event.waitUntil(
+      self.registration.showNotification(notificationTitle, notificationOptions).then(() => {
+        console.log("✅ Notification displayed successfully");
+        
+        // أخبر العملاء بتحديث العداد
+        return self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({
+              type: "REFRESH_UNREAD_COUNT",
+              timestamp: new Date().toISOString()
+            });
+          });
+        });
+      }).catch((error) => {
+        console.error("❌ Error showing notification:", error);
+      })
+    );
+  } catch (error) {
+    console.error("❌ Error processing push notification:", error);
+
+    // إذا كان البيانات نصية
+    if (event.data) {
+      event.waitUntil(
+        self.registration.showNotification("Wateen", {
+          body: event.data.text(),
+          icon: "./assets/icons/icon-192.png",
+          badge: "./assets/icons/icon-192.png",
+          tag: "wateen-fcm-notification"
+        })
+      );
+    }
+  }
+});
+
+// التعامل مع النقر على الإخطار
+self.addEventListener("notificationclick", (event) => {
+  console.log("👆 Notification clicked");
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      // إذا كان التطبيق مفتوحاً بالفعل، ركّز عليه
+      for (let client of clientList) {
+        if (client.url === "/" || client.url.includes("index.html")) {
+          console.log("✅ Focusing existing window");
+          return client.focus();
+        }
+      }
+      // وإلا افتح النافذة
+      console.log("✅ Opening new window");
+      if (clients.openWindow) {
+        return clients.openWindow("./");
+      }
+    })
+  );
+});

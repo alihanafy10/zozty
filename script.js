@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, remove, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDIebUw5V99uD1t99vUBG2P-Nshbd_xrZg",
@@ -16,10 +17,97 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const messaging = getMessaging(app);
 
 let currentUser = null;
 let appInitialized = false;
 let latestNotes = [];
+
+// =======================
+// Firebase Cloud Messaging (FCM)
+// =======================
+async function initializeFCM() {
+    try {
+        if (!('serviceWorker' in navigator)) {
+            console.warn('⚠️ Service Workers not supported');
+            return;
+        }
+
+        // طلب إذن الإخطارات
+        if (Notification.permission !== 'granted') {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                console.log('⚠️ Notification permission denied');
+                return;
+            }
+        }
+
+        // احصل على توكن FCM
+        try {
+            const token = await getToken(messaging, {
+                vapidKey: 'BN5BkZ7wPEEMQNrUhxc3KnLQ6FGt_Q_n6qZrYPRXVg-FvHwRxQI_XwXkZJJbLVzqDwXqOiXNBY-f7Ng5VXxDBD0'
+            });
+
+            if (token) {
+                console.log('✅ FCM Token obtained:', token.substring(0, 20) + '...');
+                localStorage.setItem('fcm-token', token);
+
+                // حفظ التوكن في Firebase
+                if (currentUser) {
+                    const userRef = ref(db, `fcm-tokens/${currentUser}`);
+                    await update(userRef, {
+                        token,
+                        timestamp: new Date().toISOString()
+                    });
+                    console.log('✅ FCM Token saved to Firebase');
+                }
+            } else {
+                console.warn('⚠️ No FCM Token returned');
+            }
+        } catch (error) {
+            console.error('❌ Error getting FCM Token:', error);
+        }
+
+        // استقبل الرسائل عندما يكون التطبيق مفتوحاً
+        onMessage(messaging, (payload) => {
+            console.log('📨 Message received in foreground:', payload);
+
+            if (payload.notification) {
+                const { title, body } = payload.notification;
+                new Notification(title || 'Wateen', {
+                    body: body || 'New notification',
+                    icon: './assets/icons/icon-192.png',
+                    tag: 'wateen-fcm-notification'
+                });
+            }
+
+            // حدّث البيانات
+            if (payload.data?.type === 'new-message' || payload.data?.type === 'new-note') {
+                console.log('🔄 Refreshing data due to FCM message');
+                // سيتم التحديث من Firebase listeners
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ FCM initialization error:', error);
+    }
+}
+
+// استقبل الرسائل من Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data.type === 'REFRESH_UNREAD_COUNT') {
+            console.log('📬 Refreshing unread count from push notification');
+            // سيتم التحديث من Firebase listeners
+        }
+    });
+}
+
+let latestMessages = [];
+let notesHydrated = false;
+let messagesHydrated = false;
+let lastUnreadSnapshot = { notes: 0, messages: 0, total: 0 };
+let unreadStateInitialized = false;
 
 // =======================
 // عناصر الـ DOM
@@ -118,6 +206,7 @@ loginBtn.addEventListener('click', () => {
     mainApp.classList.remove('hidden');
 
     initApp();
+    initializeFCM();
 });
 
 logoutBtn.addEventListener('click', () => {
@@ -127,6 +216,82 @@ logoutBtn.addEventListener('click', () => {
     usernameInput.value = '';
     passwordInput.value = '';
 });
+
+// =======================
+// Helper Functions for Notifications
+// =======================
+
+async function setExternalBadge(count) {
+    if ('setAppBadge' in navigator && 'clearAppBadge' in navigator) {
+        try {
+            if (count > 0) {
+                await navigator.setAppBadge(count);
+            } else {
+                await navigator.clearAppBadge();
+            }
+        } catch (error) {
+            console.error('Badge update failed:', error);
+        }
+    }
+}
+
+function getPartnerNotes() {
+    return latestNotes.filter((note) => note.owner !== currentUser);
+}
+
+function getPartnerMessages() {
+    return latestMessages.filter((message) => message.sender !== currentUser);
+}
+
+function getSeenStorageKey(type) {
+    if (!currentUser) return '';
+    return `wateen-last-seen-${currentUser.toLowerCase()}-${type}`;
+}
+
+function toTimestamp(value) {
+    if (!value) return 0;
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function getLatestTimestamp(items, fieldName) {
+    return items.reduce((latest, item) => {
+        const next = toTimestamp(item[fieldName]);
+        return next > latest ? next : latest;
+    }, 0);
+}
+
+function getSeenTimestamp(type) {
+    const key = getSeenStorageKey(type);
+    if (!key) return 0;
+    return Number(localStorage.getItem(key) || '0');
+}
+
+function setSeenTimestamp(type, value) {
+    const key = getSeenStorageKey(type);
+    if (!key) return;
+    localStorage.setItem(key, String(value));
+}
+
+function getUnreadSnapshot() {
+    const unreadNotes = getPartnerNotes().filter((note) => toTimestamp(note.createdAt) > getSeenTimestamp('notes')).length;
+    const unreadMessages = getPartnerMessages().filter((message) => toTimestamp(message.timestamp) > getSeenTimestamp('messages')).length;
+
+    return {
+        notes: unreadNotes,
+        messages: unreadMessages,
+        total: unreadNotes + unreadMessages
+    };
+}
+
+function refreshExternalIndicators() {
+    if (!currentUser || !notesHydrated || !messagesHydrated) return;
+
+    const unread = getUnreadSnapshot();
+    
+    console.log('📊 Unread count:', unread);
+    setExternalBadge(unread.total);
+}
 
 // =======================
 // تهيئة التطبيق (Firebase)
@@ -146,7 +311,9 @@ function initApp() {
             }
         }
         latestNotes = notesArray;
+        notesHydrated = true;
         renderNotes(notesArray);
+        refreshExternalIndicators();
     });
 
     // الاستماع للرسائل
@@ -159,7 +326,10 @@ function initApp() {
                 messagesArray.push({ id, ...data[id] });
             }
         }
+        latestMessages = messagesArray;
+        messagesHydrated = true;
         renderMessages(messagesArray);
+        refreshExternalIndicators();
     });
 }
 
