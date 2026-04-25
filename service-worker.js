@@ -1,9 +1,9 @@
-const CACHE_NAME = "wateen-shell-v1";
+const CACHE_NAME = "wateen-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=3",
-  "./script.js?v=3",
+  "./style.css?v=4",
+  "./script.js?v=4",
   "./manifest.webmanifest?v=1",
   "./assets/bee.jpg",
   "./assets/wolf.jpg",

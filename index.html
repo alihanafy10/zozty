@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.webmanifest?v=1">
     <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     
@@ -28,6 +28,15 @@
 
     <!-- Theme Toggle -->
     <button id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
+
+    <button id="installAppBtn" class="install-app-btn hidden" type="button">Install</button>
+    <div id="installHint" class="install-hint glass-panel hidden">
+        <div class="install-hint-header">
+            <strong>Install Wateen</strong>
+            <button id="closeInstallHintBtn" class="install-hint-close" type="button">x</button>
+        </div>
+        <p id="installHintText">Install this app on your phone for quicker access.</p>
+    </div>
 
     <!-- Login Section -->
     <div id="loginSection" class="container">
@@ -127,6 +136,6 @@
         </div>
     </div>
 
-    <script type="module" src="script.js?v=3"></script>
+    <script type="module" src="script.js?v=4"></script>
 </body>
 </html>

@@ -52,17 +52,113 @@ const notesFilterButtons = document.querySelectorAll('.notes-filter-btn');
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendMsgBtn = document.getElementById('sendMsgBtn');
+const installAppBtn = document.getElementById('installAppBtn');
+const installHint = document.getElementById('installHint');
+const installHintText = document.getElementById('installHintText');
+const closeInstallHintBtn = document.getElementById('closeInstallHintBtn');
 const noteFilters = {
     mine: 'all',
     partner: 'all'
 };
+let deferredInstallPrompt = null;
+let installHintDismissed = false;
+
+function isRunningStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function isIosSafari() {
+    const ua = window.navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    const isWebKit = /WebKit/i.test(ua);
+    const isCriOS = /CriOS/i.test(ua);
+    const isFxiOS = /FxiOS/i.test(ua);
+    return isIOS && isWebKit && !isCriOS && !isFxiOS;
+}
+
+function hideInstallUI() {
+    installAppBtn.classList.add('hidden');
+    installHint.classList.add('hidden');
+}
+
+function showInstallButton() {
+    if (isRunningStandalone()) {
+        hideInstallUI();
+        return;
+    }
+
+    installAppBtn.classList.remove('hidden');
+}
+
+function maybeShowInstallUI() {
+    if (isRunningStandalone()) {
+        hideInstallUI();
+        return;
+    }
+
+    if (deferredInstallPrompt) {
+        installHint.classList.add('hidden');
+        showInstallButton();
+        return;
+    }
+
+    if (isIosSafari()) {
+        showInstallButton();
+        if (!installHintDismissed) {
+            installHintText.textContent = 'On iPhone: tap Share, then Add to Home Screen.';
+            installHint.classList.remove('hidden');
+        }
+        return;
+    }
+
+    hideInstallUI();
+}
+
+installAppBtn.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+            hideInstallUI();
+        }
+        deferredInstallPrompt = null;
+        maybeShowInstallUI();
+        return;
+    }
+
+    if (isIosSafari()) {
+        installHintDismissed = false;
+        installHintText.textContent = 'On iPhone: tap Share, then Add to Home Screen.';
+        installHint.classList.remove('hidden');
+    }
+});
+
+closeInstallHintBtn.addEventListener('click', () => {
+    installHintDismissed = true;
+    installHint.classList.add('hidden');
+});
+
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installHint.classList.add('hidden');
+    showInstallButton();
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    hideInstallUI();
+});
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js').catch((err) => {
             console.error('Service worker registration failed:', err);
         });
+        maybeShowInstallUI();
     });
+} else {
+    maybeShowInstallUI();
 }
 
 // =======================
