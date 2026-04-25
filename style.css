@@ -572,11 +572,53 @@ section {
 }
 
 .notes-grid h4 {
-    margin-bottom: 20px;
     font-size: 16px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+.notes-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.notes-toolbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.notes-filter-btn {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: none;
+}
+
+.notes-filter-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.notes-filter-btn.active {
+    color: white;
+    background: var(--accent-gradient);
+    box-shadow: 0 8px 20px rgba(244, 63, 94, 0.22);
 }
 
 .notes-list {
@@ -624,6 +666,12 @@ section {
     font-size: 16px;
     line-height: 1.7;
     color: var(--text-main);
+}
+
+.item-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
 }
 
 /* Edit / Delete Overlays */
@@ -676,6 +724,60 @@ section {
     background: #10b981 !important;
     color: white !important;
     border-color: #10b981 !important;
+}
+
+.like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 9px 6px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.like-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 58px;
+}
+
+.like-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(244, 63, 94, 0.28);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+}
+
+.like-btn.liked {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(251, 146, 60, 0.16));
+    color: #e11d48;
+    border-color: rgba(244, 63, 94, 0.3);
+}
+
+.like-count {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.08);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.like-btn.liked .like-count {
+    background: rgba(255, 255, 255, 0.55);
 }
 
 /* =========================================
@@ -782,6 +884,50 @@ section {
     object-fit: cover;
 }
 
+.message-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.message-time {
+    font-size: 11px;
+    line-height: 1.2;
+    opacity: 0.72;
+    white-space: nowrap;
+}
+
+.message.me .like-btn {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.12));
+    border-color: rgba(255, 255, 255, 0.22);
+    color: white;
+    box-shadow: none;
+}
+
+.message.me .like-btn.liked {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.18));
+    border-color: rgba(255, 255, 255, 0.34);
+    color: white;
+}
+
+.message.me .like-count {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.message.me .message-time {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.message.other .like-count {
+    background: rgba(15, 23, 42, 0.08);
+}
+
+.message.other .message-time {
+    color: var(--text-muted);
+}
+
 .chat-input-box {
     padding: 20px 30px;
     border-top: 1px solid var(--glass-border);
@@ -879,6 +1025,19 @@ section {
         gap: 25px;
     }
 
+    .notes-panel-header {
+        align-items: flex-start;
+    }
+
+    .notes-toolbar {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .notes-filter-btn {
+        flex: 1;
+    }
+
     .note-card {
         padding: 20px;
     }
@@ -902,6 +1061,10 @@ section {
         max-width: 88%;
         padding: 14px 18px;
         font-size: 14px;
+    }
+
+    .like-btn {
+        width: auto;
     }
 
     .chat-input-box {
